@@ -79,3 +79,4 @@ to use some sort of connection that has a valid account you can use going forwar
  
 # Copyright
 - Copyright (c) 2017 idazco
+- Copyright (c) 2019 nexiles GmbH
