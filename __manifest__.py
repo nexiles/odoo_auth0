@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Copyright (c) 2017 idazco
 {
     'name': 'Auth0',
     'version': '1.0',

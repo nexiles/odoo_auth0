@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Copyright (c) 2017 idazco
 from odoo.addons.auth_oauth.controllers.main import OAuthLogin
 import uuid
 from odoo import http, _

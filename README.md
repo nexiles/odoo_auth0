@@ -76,4 +76,6 @@ to use some sort of connection that has a valid account you can use going forwar
  which was explicitly trusted because of how it was provided and there was no additional step to validate the access token.
  JWTs have mostly replaced access tokens, but similarly, they could also be trusted because of how they are provided.
  Therefore this module does not implement JWT signature verification at this time.
-  
+ 
+# Copyright
+- Copyright (c) 2017 idazco
