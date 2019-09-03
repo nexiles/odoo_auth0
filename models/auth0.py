@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2017 idazco
 # Copyright (c) 2019 nexiles GmbH
+
 from odoo import fields, models
 import requests
 
@@ -10,12 +11,14 @@ import json
 
 class Auth0(models.Model):
     _inherit = 'auth.oauth.provider'
+    _name = 'auth0.provider'
+    _description = 'Extendend OAuth2 Model to support the code flow'
 
     client_secret = fields.Char(string='Client Secret')
     jwt_secret = fields.Char(string='JWT Secret')
 
     def get_auth0_oauth_provider(self):
-        return self.env['auth.oauth.provider'].sudo().search([
+        return self.env['auth0.provider'].sudo().search([
             ('id', '=', self.env.ref('auth_oauth_provider_auth0').id),
         ], limit=1)
 
@@ -33,6 +36,6 @@ class Auth0(models.Model):
         response = json.loads(response)
 
         if response.get('error'):
-            raise UserError(_('Could not create the client: %s') % response)
+            raise UserError('Could not create the client: %s' % response)
 
         return response

@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
+<!-- Copyright (c) 2017 idazco -->
+<!-- Copyright (c) 2019 nexiles GmbH -->
 <odoo>
         <record id="view_auth0_form" model="ir.ui.view">
             <field name="name">auth0.form</field>
-            <field name="model">auth.oauth.provider</field>
+            <field name="model">auth0.provider</field>
             <field name="arch" type="xml">
                 <form string="arch">
                     <sheet>
@@ -26,7 +28,7 @@
         </record>        
         <record id="view_auth0_tree" model="ir.ui.view">
             <field name="name">auth0.tree</field>
-            <field name="model">auth.oauth.provider</field>
+            <field name="model">auth0.provider</field>
             <field name="arch" type="xml">
                 <tree string="arch">
                     <field name="name" />
@@ -36,13 +38,13 @@
             </field>
         </record>
 
-        <record id="action_auth0" model="ir.actions.act_window">
+        <record id="action_auth0_provider" model="ir.actions.act_window">
             <field name="name">Auth0</field>
-            <field name="res_model">auth.oauth.provider</field>
+            <field name="res_model">auth0.provider</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
         <menuitem id="menu_auth0" name="Auth0"
             parent="base.menu_users" sequence="30"
-            action="action_auth0" groups="base.group_no_one"/>
+            action="action_auth0_provider" groups="base.group_no_one"/>
 </odoo>

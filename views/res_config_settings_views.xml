@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This file is based on a file from Odoo, see COPYRIGHT for details-->
+<!-- Copyright (c) 2019 nexiles GmbH -->
+<odoo>
+        <record id="res_config_settings_view_form" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.auth.oauth</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <div id="module_auth_oauth" position="after">
+                    <div class="content-group" attrs="{'invisible': [('module_auth_oauth','=',False)]}">
+                        <div class="mt16">
+                            <button type="action" name="%(odoo_auth0.action_auth0_provider)d" string="Auth0 Providers" icon="fa-arrow-right" class="btn-link"/>
+                        </div>
+                    </div>
+                </div>
+            </field>
+        </record>
+</odoo>
