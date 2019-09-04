@@ -55,8 +55,6 @@ class Auth0OAuthLogin(OAuthLogin):
         except Exception:
             providers = []
 
-        _logger.error("Found %d providers" % len(providers))
-
         for provider in providers:
             # request.session['auth0.session_db'] = request.session.db
             scope = provider['scope'] if 'email' in provider['scope'] else provider['scope'] + ' email'
