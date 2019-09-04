@@ -2,6 +2,7 @@
 # Copyright (c) 2017 idazco
 # This file is heavily inspired by parts of Oddo, see COPYRIGHT for details
 # Copyright (c) 2019 nexiles GmbH
+
 import functools
 import logging
 
@@ -11,8 +12,6 @@ import werkzeug
 import werkzeug.urls
 from werkzeug.exceptions import BadRequest
 
-import requests
-
 from odoo import api, http, SUPERUSER_ID
 from odoo.exceptions import AccessDenied
 from odoo.http import request
@@ -20,10 +19,6 @@ from odoo import registry as registry_get
 
 from odoo.addons.auth_oauth.controllers.main import OAuthLogin
 from odoo.addons.web.controllers.main import set_cookie_and_redirect, login_and_redirect
-
-from passlib.context import CryptContext
-import jwt
-import random
 
 _logger = logging.getLogger(__name__)
 
@@ -86,7 +81,6 @@ class Auth0OAuthLogin(OAuthLogin):
         state = request.params.get('state')
         if not state:
             return 'No state provided'
-        _logger.error("state: %s", state)
         state = json.loads(state)
 
         provider_id = state['p']
@@ -106,17 +100,7 @@ class Auth0OAuthLogin(OAuthLogin):
         with registry.cursor() as cr:
             env = api.Environment(cr, SUPERUSER_ID, context)
             credentials = env['res.users'].sudo().auth_oauth2(provider_id, code, state)
-            _logger.info("Credentials: %s %s %s" % (credentials))
             cr.commit()
             resp = login_and_redirect(*credentials, redirect_url=url)
             return resp
 
-    @staticmethod
-    def _check_rate_limits(validation_response):
-        rate_limit_remaining = validation_response.headers.get('X-RateLimit-Remaining')
-        if rate_limit_remaining.isdigit():
-            rate_limit_remaining = int(rate_limit_remaining)
-            if rate_limit_remaining < 2000:
-                _logger.warn('Auth0 rate limit remaining: %d' % rate_limit_remaining)
-            elif rate_limit_remaining < 500:
-                _logger.warn('[critical] Auth0 rate limit remaining: %d' % rate_limit_remaining)

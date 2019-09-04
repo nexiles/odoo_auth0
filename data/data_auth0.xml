@@ -13,6 +13,7 @@
             <field name="auth_endpoint">https://[your-auth0-domain]/authorize</field>
             <field name="scope">openid profile</field>
             <field name="validation_endpoint">https://[your-auth0-domain]/oauth/token</field>
+            <field name="is_jwt" eval="True"/>
         </record>
     </data>
 </odoo>

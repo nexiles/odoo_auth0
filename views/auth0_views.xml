@@ -21,6 +21,7 @@
                             <field name="scope" />
                             <field name="validation_endpoint" />
                             <field name="data_endpoint" />
+                            <field name="is_jwt" />
                         </group>
                     </sheet>
                 </form>

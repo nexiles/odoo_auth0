@@ -5,7 +5,7 @@
     <data noupdate="1">
 
         <!-- Allow external users to sign up -->
-        <function model="ir.config_parameter" name="set_param" eval="('auth_signup.allow_uninvited', False)"/>
+        <function model="ir.config_parameter" name="set_param" eval="('auth_signup.allow_uninvited', True)"/>
 
     </data>
 </odoo>

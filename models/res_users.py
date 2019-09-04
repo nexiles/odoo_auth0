@@ -8,7 +8,7 @@ import logging
 
 import requests
 import jwt
-from odoo import api, models, fields
+from odoo import api, models
 from odoo.addons.auth_signup.models.res_users import SignupError
 from odoo.exceptions import AccessDenied
 
@@ -26,7 +26,6 @@ class ResUsers(models.Model):
             'login': email,
             'email': email,
             'oauth_provider_id': provider["id"],
-            'oauth_uid': 1111,
             'oauth_access_token': token,
             'active': True,
         }
@@ -36,6 +35,8 @@ class ResUsers(models.Model):
         """ retrieve and sign in the user corresponding to provider and validated access token
             :param provider: oauth provider id (int)
             :param oauth_profile: the user profile provided by the oauth provider
+            :param state: the state parameter as dictionary
+            :param token: the token from the oauth provider
             :return: user login (str)
             :raise: AccessDenied if signin failed
 
@@ -49,7 +50,6 @@ class ResUsers(models.Model):
             assert len(user) == 1
 
             self.update_oauth2_user_info(user, provider, oauth_profile, token)
-            _logger.info("User: %s" % user.login)
 
             return user.login
         except AccessDenied as access_denied_exception:
@@ -60,11 +60,13 @@ class ResUsers(models.Model):
             values['partner_id'] = 0
             _logger.info("About to create new user %s" % values)
             try:
+                _logger.info("Invitation scope %s" % self._get_signup_invitation_scope())
                 _, login, _ = self.signup(values)
                 _logger.info("Successfully created!")
                 return login
-            except SignupError:
-                _logger.info("Signup Error")
+            except SignupError as se:
+                _logger.error("Traceback %s " % se)
+                _logger.error("Signup Error for user with email %s using provider %s" % (oauth_email, provider["name"]))
                 raise access_denied_exception
 
     @api.model
@@ -79,13 +81,9 @@ class ResUsers(models.Model):
 
         oauth_profile = self._auth_oauth2_profile(provider, token)
 
-        # # required check
-        # if not oauth_profile.get('email'):
-        #     # Workaround: facebook does not send 'user_id' in Open Graph Api
-        #     if oauth_profile.get('id'):
-        #         oauth_profile['user_id'] = oauth_profile['id']
-        #     else:
-        #         raise AccessDenied()
+        # required check
+        if not oauth_profile.get('email'):
+            raise AccessDenied()
 
         # retrieve and sign in user
         login = self._auth_oauth2_signin(provider, oauth_profile, state, token)
@@ -98,19 +96,17 @@ class ResUsers(models.Model):
     @api.model
     def _auth_oauth2_token(self, provider, code):
         """Returns the token from the OAuth2 Authentication server"""
-        _logger.error("Oauth provider: %s" % provider)
         oauth_response = self._auth_oauth2_rpc(provider["validation_endpoint"], code, provider)
         if oauth_response.get('error'):
             raise Exception(oauth_response['error'])
-        if not "id_token" in oauth_response:
+        if "id_token" not in oauth_response:
             raise Exception("id_token not in response")
         return oauth_response['id_token']
 
     @api.model
     def _auth_oauth2_profile(self, provider, token):
-        IS_JWT = True
-        if IS_JWT:
-            return self._parse_jwt(token)
+        if provider["is_jwt"]:
+            return self._parse_jwt(token, provider.get("jwt_secret"))
         # elif provider.data_endpoint:
         #     data = self._auth_oauth_rpc(oauth_provider.data_endpoint, access_token, code, provider)
         #     validation.update(data)
@@ -126,6 +122,7 @@ class ResUsers(models.Model):
             'code': code,
         }
         resp = requests.post(url, json=post_data)
+        self._check_rate_limits(resp)
         return resp.json()
 
     @staticmethod
@@ -149,3 +146,12 @@ class ResUsers(models.Model):
             'active': True,
         })
 
+    @staticmethod
+    def _check_rate_limits(validation_response):
+        rate_limit_remaining = validation_response.headers.get('X-RateLimit-Remaining')
+        if rate_limit_remaining.isdigit():
+            rate_limit_remaining = int(rate_limit_remaining)
+            if rate_limit_remaining < 2000:
+                _logger.warn('Auth0 rate limit remaining: %d' % rate_limit_remaining)
+            elif rate_limit_remaining < 500:
+                _logger.warn('[critical] Auth0 rate limit remaining: %d' % rate_limit_remaining)

@@ -1,4 +1,4 @@
-# Auth0 module for Odoo
+# Auth0 module for Odoo 12
 
 This makes it simple to implement SSO with Auth0 in Odoo. While this module currently inherits from
 the OAuth module available from the Odoo 10 CE release, we plan in future to make it a stand-alone module.
@@ -10,7 +10,7 @@ configuration options offered in the standard module. Typically, one would use o
 ## Download and install
 
  1. Clone this project. The entire project is the module, so you can either clone it directly into your
- Odoo 10 add-ons folder or just link it to the add-ons folder.
+ Odoo 12 add-ons folder or just link it to the add-ons folder.
  1. Go to the Apps list and remove the `Apps` filter in the search box since this module is a utility and not an app.
  1. Locate the `Auth0` module and install it.
  
@@ -25,9 +25,9 @@ This will download the module and unzip it's source in the image to `/tmp/downlo
 will need to add to the add-ons path in your Odoo config
 
 ### Python dependencies
-If needed install pyjwt as follows:
+If needed install jwt as follows:
 
-    pip install pyjwt
+    pip install jwt
  
 ## Configure
 
