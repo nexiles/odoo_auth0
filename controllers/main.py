@@ -66,6 +66,7 @@ class Auth0OAuthLogin(OAuthLogin):
                 client_id=provider['client_id'],
                 redirect_uri=request.httprequest.url_root + 'auth0/callback',
                 state=json.dumps(state),
+                connection='main-tenant-oidc' #skip to auth0 main-tenant
             )
             # link for the login button in login dialog
             provider['auth_link'] = "%s?%s" % (provider['auth_endpoint'], werkzeug.url_encode(params))
